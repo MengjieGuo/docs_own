@@ -119,6 +119,7 @@ select * from oracle_mirror.user_test;
 docker login --username=slencecde registry.cn-hangzhou.aliyuncs.com
 # pull a version
 docker pull registry.cn-hangzhou.aliyuncs.com/mengjieguo/postgres_extend:1.0.0
+docker tag registry.cn-hangzhou.aliyuncs.com/mengjieguo/postgres_extend:1.0.0 postgres_extend:1.0.0
 ```
 
 ### docker-compose.yml 配置
@@ -164,3 +165,144 @@ docker-compose up
 ```
 
 ## 清理映射关系
+
+## 连接
+
+```python
+    postgres_ip: 192.168.1.xxx (本机postgresip)
+    postgres_port: 5432(本机postgres port）
+    postgres_database: test_oracle_fdw （本机postgres数据库）
+    postgres_admin_user: postgres （本机postgres 用户）
+    postgres_admin_passwd: test_user（本机postgres  超级用户密码）
+    postgres_user: test_use（本机postgres  用户）
+    postgres_passwd: test_use （本机postgres  密码）
+```
+
+下面是测试用的sql命令
+
+```sql
+select * from pg_extension;
+select * from pg_foreign_data_wrapper;
+select * from pg_foreign_server;
+select * from pg_foreign_table;
+
+select * from oracle_mirror.user_test;
+
+SELECT * FROM test2
+WHERE EXTRACT(month FROM "text") = 2
+AND EXTRACT(year FROM "text") = 2011;
+
+select *  FROM
+        oracle_mirror.VEHICLE  WHERE hpzl='02' and hphm='AAB008';
+
+-- 首先使用在vehicle表上创建存储过程func_guo_select_vehicles_1，用户根据车牌查询机动车基本信息
+create function func_guo_select_vehicles_1(
+  hpzl varchar(2) = null,
+  hphm char = null,
+  sfzmhm char = null
+) returns table(xh char, hpzl char, hphm char, sfzmhm char) as
+$func$
+  select a.xh, a.hpzl, a.hphm, a.sfzmhm
+from oracle_mirror.vehicle a
+where ($1 is null or a.hpzl = $1)
+and  ($2 is null or a.hphm = $2)
+and  ($3 is null or a.sfzmhm= $3)
+$func$ LANGUAGE sql;
+
+select * from func_guo_select_vehicles_1(); -- 查询所有车辆数据
+select * from func_guo_select_vehicles_1(hpzl := '02'); --查询车辆 hpzl 是 02 的车辆信息
+select * from func_guo_select_vehicles_1(hpzl := '02', hphm := 'AAB008'); --查询车辆 02AAB008 的车辆信息
+select * from func_guo_select_vehicles_1(sfzmhm := '410126196905102558'); --某人的的车辆信息，如果没有找到会返回空
+
+-- 加入对时间范围的查询
+create function func_guo_select_vehicles_3(
+  hpzl varchar(2) = null,
+  hphm char = null,
+  sfzmhm char = null,
+  bxzzrq_start char = null,
+  bxzzrq_end char = null
+) returns table(xh char, hpzl char, hphm char, sfzmhm char, bxzzrq char) as
+$func$
+  select a.xh, a.hpzl, a.hphm, a.sfzmhm, to_char(bxzzrq, 'YYYY-MM-DD HH24:MI:SS') bxzzrq
+from oracle_mirror.vehicle a
+where ($1 is null or a.hpzl = $1)
+and  ($2 is null or a.hphm = $2)
+and  ($3 is null or a.sfzmhm= $3)
+and   case when ($4 is null or $5 is null) then (to_timestamp($4, 'YYYY-MM-DD HH24:MI:SS') < a.bxzzrq) else
+          (to_timestamp($4, 'YYYY-MM-DD HH24:MI:SS') < a.bxzzrq
+        and to_timestamp($5, 'YYYY-MM-DD HH24:MI:SS') > a.bxzzrq) end
+$func$ LANGUAGE sql;
+
+select * from func_guo_select_vehicles_2(); -- 时间现在是必填的。。。
+
+-- 多表连接
+create function func_guo_select_vehicles_3(
+  hpzl varchar(2) = null,
+  hphm char = null,
+  sfzmhm char = null
+  --bxzzrq_start char = null,
+  --bxzzrq_end char = null
+) returns table(xh char, hpzl char, hphm char, sfzmhm char, bxzzrq char, xh_v char, wfdz char) as
+$func$
+select a.xh, a.hpzl, a.hphm, a.sfzmhm, to_char(a.bxzzrq, 'YYYY-MM-DD HH24:MI:SS') bxzzrq, b.xh xh_v, b.wfdz
+from oracle_mirror.vehicle a
+INNER join oracle_mirror.vio_surveil b
+  on  (a.hpzl = b.hpzl and ('豫'|| a.hphm) = b.hphm)
+  where ($1 is null or a.hpzl = $1)
+  and ($2 is null or a.hphm = $2)
+  and  ($3 is null or a.sfzmhm= $3)
+$func$ LANGUAGE sql;
+
+select * from func_guo_select_vehicles_3(hpzl := '02', hphm := 'AAB008'); -- 查询车辆的所有现场？违章
+
+-- 多维分析函数
+-- 分析机动车信息表
+-- 按照地区显示车辆数据量
+-- 按照每年的注册车辆
+-- 按照机动车状态显示
+-- 按照是否逾期2个检验周期期止
+-- 按照是否逾期强制报废期止
+-- 按照车辆用途
+-- 按照用户属性
+-- 按照环保达标
+-- 按照是否抵押
+-- 按照车辆是否转入过户
+-- 按照机动车状态
+-- 按照保险截止日期前3个月，6个月，9个月，12个月，1年又3个月，1年又6个月，1年又9个月，2年
+-- 按照号牌种类
+create function func_guo_select_vehicles_10(
+  car_type char = NULL , -- hpzl
+  car_status char = NULL, --
+
+)
+
+
+
+-- func
+-- 使用user_test ,zcgl.user_test都无法访问表, 请使用 oracle_mirror.user_test 访问
+create function func_guo_test_1(
+  name text = null,
+  sex text = null,
+  id_card text = null,
+  job_part text = null,
+  phone text = null,
+  address text = null
+  --input_time date  = null
+) returns table(name text, sex text, id_card text, job_part text, phone text, home_address text, input_time text) as
+$func$
+select a.name, a.sex, a.id_card, a.job_part, a.phone, a.home_address, a.input_time
+from oracle_mirror.user_test a
+where ($1 is null or a.name = $1)
+  and ($2 is null or a.sex = $2)
+  and ($3 is null or a.id_card = $3)
+  and ($4 is null or a.job_part = $4)
+  and ($5 is null or a.phone = $5)
+  and ($6 is null or a.phone = $6)
+  --and ($7 is null or a.phone = $7)
+  $func$ LANGUAGE sql;
+-- 使用刚才的func
+select * from func_guo_test_1();
+select * from func_guo_test_1(name := '于超');
+select * from func_guo_test_1(name := '于超', job_part := '000000000009');
+
+```
