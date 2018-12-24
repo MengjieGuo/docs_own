@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+  <title>./docs</title>
+  <link rel="stylesheet" href="https://unpkg.com/docute@3/dist/docute.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- <script src="https://unpkg.com/docute/plugins/docsearch.js"></script>
+<script src="config.js"></script>
+<script src="https://unpkg.com/docute/dist/docute.js"></script> -->
+
+  <!-- you can add it everywhere outside #app -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="my-icon"  viewBox="0 0 22 22">
+      <!-- all shapes like `<path>` go here -->
+    </symbol>
+    <!-- ... other symbols -->
+  </svg>
+  <script src="https://unpkg.com/docute@3/dist/docute.js"></script>
+
+  <!-- Google Analytics -->
+<script>
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+  ga('create', 'UA-129139256-1', 'auto');
+  ga('send', 'pageview');
+  docute.router.afterEach(function (to) {
+    ga('set', 'page', to.fullPath);
+    ga('send', 'pageview');
+  });
+  </script>
+  <script async src='https://www.google-analytics.com/analytics.js'></script>
+  <!-- End Google Analytics -->
+
+  <!-- add more langue for code-->
+  <script src="/path/to/docute.js"></script>
+  <!-- add your language after the main docute bundle -->
+  <script src="https://unpkg.com/prismjs/components/prism-python.js"></script>
+  <script>
+    docute.init(
+
+        {
+        marked: {
+          smartypants: true
+          // ...
+        },
+          // 使用 markdown 标题生成目录 默认 2 为 h2 h3 
+          tocVisibleDepth: 4,
+      // 项目根目录里的 README.md
+      //home: 'https://raw.githubusercontent.com/egoist/docute/master/README.md'
+      // true 将会默认使用 `landing.html`
+      //landing: true,
+      // 也可以用自定义页面
+      //landing: '_my-landing.html',
+      // 当然 markdown 文件也可以
+      //landing: 'landing.md'
+    //当你有多个页面的时候你很可能需要一个导航栏方便用户浏览，你可以通过配置文件添加导航栏:
+    
+    // 多语言需要 markdown控制   front-matter
+    // nav: {
+    // default: [{title: 'Home', path: '/'}],
+    // chinese: [{title: '首页', path: '/language/chinese'}],
+    // },
+
+    nav: [
+    // 首页
+    {title: 'Home', path: '/'},
+    // 中文文档
+    {title: 'Language-chinese', path: '/language/chinese'},
+    {title: 'api', type: 'dropdown', items: [
+      {title: 'api2', path: '/language/chinese'},
+      {title: 'api1', path: '/language/japanese'},
+    ]},
+
+    // 带label的下拉框 label sep
+    {
+      title: 'Ecosystem', type: 'dropdown', items: [
+        {type: 'label', title: 'Help'},
+        // ... items
+        {title: 'api2', path: '/language/chinese'},
+        {title: 'api1', path: '/language/japanese'},
+        {type: 'sep'}, // separator
+        // ... other items
+        {type: 'label', title: 'Help'},
+        // ... items
+        {title: 'api2', path: '/language/chinese'},
+        {title: 'api1', path: '/language/japanese'},
+      ]
+    },
+    // Tool usage.
+    {title: '常用工具的使用', type: 'dropdown', items: [
+        // docker 
+        {type: 'label', title: 'docker'},
+        {title: '制作django项目镜像', path: '/tools/docker/djangoImages/djangoImages'},
+        {type: 'sep'}, // separator
+        {type: 'label', title: 'git'},
+        // ... git
+        {title: 'git操作', path: '/tools/git/gitOperation'},
+        {title: 'git推送流程', path: '/tools/git/git流程'},
+        {type: 'sep'}, // separator
+        {type: 'label', title: 'transition'},
+        // ... transition
+        {title: 'transition', path: '/tools/pythonTransition/pythonTransition'},
+        {type: 'sep'}, // separator
+        // api manager
+        {type: 'label', title: 'apiManager'},
+        {title: 'api manager', path: '/tools/apiManager/apiManager'},
+        {type: 'sep'}, // separator
+        // postgres
+        {type: 'label', title: 'postgres'},
+        {title: 'postgres general operation', path: '/tools/postgres/generalOperation'},
+        {title: 'postgres FDW', path: '/tools/postgres/postgres_fdw'},
+
+        {type: 'sep'}, // separator
+         // django
+        {type: 'label', title: 'django'},
+        {title: 'django docx template', path: '/tools/djangoPython/pythonTemplateDocs'},
+        {title: 'django vue add previous access url', path: '/tools/djangoPython/withVue/addPreURL'},
+
+        {type: 'sep'}, // separator
+         // online office editor
+        {type: 'label', title: 'office editor'},
+        {title: 'libreoffice online', path: '/tools/onlineOfficeEdit/libreofficeOnline'},
+        {type: 'sep'}, // separator
+    ]},
+    // Service and server monitor.
+    {title: '服务及服务器监控', type: 'dropdown', items: [
+        {type: 'label', title: '服务监控'},
+        // ... items
+        {title: 'nginx服务监控', path: '/monitor/serviceMonitor/nginxMonitor'},
+        {title: '日志监控', path: '/monitor/serviceMonitor/logMonitor'},
+        {title: '监控工具', path: '/monitor/serviceMonitor/monitorTools'},
+
+        {type: 'sep'}, // separator
+        // ... other items
+        {type: 'label', title: '服务监控器'},
+        // ... items
+        {title: 'api2', path: '/language/chinese'},
+        {title: 'api1', path: '/language/japanese'},
+    ]},
+    // ssh 
+    {title: 'Linux', type: 'dropdown', items: [
+      {type: 'label', title: 'ssh'},
+      {title: 'ssh 免密登陆', path: '/linux/ssh/sshOperation'},
+    ]},
+    // Node multi version control.
+    {title: 'node', type: 'dropdown', items: [
+      {title: '多版本控制', path: '/node/versionControl'},
+    ]},
+
+    ],
+
+    // 失败，正则显示  比赛路线
+    // nav: [{
+    // title: 'Languages', type: 'dropdown', items: [{
+    //   path: '/en',
+    //   title: 'English',
+    //   // show `English` instead of `Languages` as the dropdown title
+    //   // only match `/en` and `/en/xxx` not `/enxxx`
+    //   matchPath: /^\/en[\/$]/,
+    // }],
+    // }],
+
+ // 图标
+  // slug for your github repo
+  repo: 'tj/co',
+  // twitter username
+  twitter: 'realDonaldTrump',
+  // the link to source file of current page
+  'edit-link': 'https://github.com/egoist/docute/blob/master/docs',
+
+// link to github your account.
+  icons: [{
+    icon: 'github',
+    label: 'Contribute on GitHub',
+    link: 'https://github.com/owner/repo'
+  }],
+// self icon link to some website.
+  icons: [
+    {
+      label: 'Hovered!', // the text for tooltip
+      svgId: 'my-icon', // the id of symbol
+      link: 'http://baidu.com'
+    }
+  ],
+  // 还可以加css，等
+  icons: {
+    default: [{label: 'hello'}],
+    chinese: [{label: '你好'}]
+  },
+    }
+    )
+
+  </script>
+</body>
+</html>

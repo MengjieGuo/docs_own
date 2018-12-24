@@ -1,0 +1,11 @@
+version: '2.1'
+services:
+
+  nginx:
+      restart: unless-stopped
+      image: nginx:latest
+      ports:
+        - "8002:443"
+      volumes:
+        - ./nginx/extend_conf.conf:/etc/nginx/conf.d/my.conf
+        - ./:/etc/ssl/
